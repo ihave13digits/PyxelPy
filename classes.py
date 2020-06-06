@@ -7,23 +7,24 @@ BG = list(COLOR_BG)
 
 class Cell(sprite.Sprite):
 
-    def __init__(self, x, y, r=BG[0], g=BG[1], b=BG[2]):
+    def __init__(self, x, y, r=BG[0], g=BG[1], b=BG[2], a=BG[3]):
         sprite.Sprite.__init__(self)
 
         self.posx = x
         self.posy = y
-        self.color = (r, g, b)
+        self.color = (r, g, b, a)
         self.image = None
         self.rect = None
 
     def set(self, w, h):
         self.image = Surface([w, h])
+        self.image.convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.topleft = (self.posx, self.posy)
 
-    def fill(self, r, g, b, color=(-1, -1, -1)):
+    def fill(self, r, g, b, a, color=(-1, -1, -1)):
         if color != (-1, -1, -1):
-            self.color = (r, g, b)
+            self.color = (r, g, b, a)
         else:
             self.color = color
 
@@ -37,12 +38,12 @@ class Palette:
         self.height = height
         self.colors = []
 
-    def add_color(self, r, g, b):
-        c = (r, g, b)
+    def add_color(self, r, g, b, a):
+        c = (r, g, b, a)
         self.colors.append(c)
 
-    def insert_color(self, r, g, b, index):
-        self.colors.insert(index, (r, g, b))
+    def insert_color(self, r, g, b, a, index):
+        self.colors.insert(index, (r, g, b, a))
 
     def remove_color(self, index):
         self.colors.pop(index)
@@ -94,8 +95,8 @@ class Toolbar:
         self.button_export = Button(x+CELL_SIZE*4, y, 'export.png')
         self.button_import = Button(x+CELL_SIZE*6, y, 'import.png')
 
-        self.color_l = Cell(x, y+CELL_SIZE*4, r=65, g=65, b=65)
-        self.color_r = Cell(x+CELL_SIZE*4, y+CELL_SIZE*4, r=65, g=65, b=65)
+        self.color_l = Cell(x, y+CELL_SIZE*4, r=65, g=65, b=65, a=255)
+        self.color_r = Cell(x+CELL_SIZE*4, y+CELL_SIZE*4, r=65, g=65, b=65, a=255)
         
         self.tool_1 = Button(x+CELL_SIZE*0, y+CELL_SIZE*8, 'norm.png', cursor_norm)
         self.tool_2 = Button(x+CELL_SIZE*2, y+CELL_SIZE*8, 'draw.png', cursor_draw)
