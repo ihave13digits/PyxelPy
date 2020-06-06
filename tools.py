@@ -1,5 +1,7 @@
 def select(target, mp):
     target.click_buffer.append(mp)
+    if len(target.click_buffer) > 2:
+        target.click_buffer.pop(1)
 
 def set_select(target, mp):
     target.click_buffer.append(mp)
@@ -21,6 +23,102 @@ def set_select(target, mp):
 
     target.click_buffer.clear()
     target.clipboard = data
+    target.working_data = False
+
+def rect_e(target, mp, C):
+    try:
+        v1 = (int(mp[1]/target.cell_size) * int(list(target.canvas_size)[0]/target.cell_size)) + int(mp[0]/target.cell_size)
+        for x in range(target.clipboard['width']):
+            for y in range(target.clipboard['height']):
+                if (x == 0 or x == target.clipboard['width']-1) or (y == 0 or y == target.clipboard['height']-1):
+                    try:
+                        v2 = (y * target.clipboard['width']) + x
+                        v = v1 + ((y * int(list(target.canvas_size)[0]/target.cell_size)) + x)
+                        if type(C) == int:
+                            target.canvas[v].color = target.toolbar.palette.colors[C]
+                        else:
+                            target.canvas[v].color = C
+                        target.canvas[v].update()
+                        target.screen.blit(target.canvas[v].image, target.canvas[v])
+                    except IndexError:
+                        pass
+    except KeyError:
+        pass
+    target.working_data = False
+
+def rect_f(target, mp, C):
+    try:
+        v1 = (int(mp[1]/target.cell_size) * int(list(target.canvas_size)[0]/target.cell_size)) + int(mp[0]/target.cell_size)
+        for x in range(target.clipboard['width']):
+            for y in range(target.clipboard['height']):
+                try:
+                    v2 = (y * target.clipboard['width']) + x
+                    v = v1 + ((y * int(list(target.canvas_size)[0]/target.cell_size)) + x)
+                    if type(C) == int:
+                        target.canvas[v].color = target.toolbar.palette.colors[C]
+                    else:
+                        target.canvas[v].color = C
+                    target.canvas[v].update()
+                    target.screen.blit(target.canvas[v].image, target.canvas[v])
+                except IndexError:
+                    pass
+    except KeyError:
+        pass
+    target.working_data = False
+
+def oval_e(target, mp, C):
+    try:
+        eps = target.clipboard['width']/6.28
+        cx = int(mp[0]/target.cell_size) + int(target.clipboard['width']/2)-1
+        cy = int(mp[1]/target.cell_size) + int(target.clipboard['height']/2)-1
+        v1 = (int(mp[1]/target.cell_size) * int(list(target.canvas_size)[0]/target.cell_size)) + int(mp[0]/target.cell_size)
+        for x in range(target.clipboard['width']):
+            for y in range(target.clipboard['height']):
+                v = v1 + ((y * int(list(target.canvas_size)[0]/target.cell_size)) + x)
+                w = int(target.clipboard['width']/2)-1
+                h = int(target.clipboard['height']/2)-1
+                if abs((x-cx)**2 -w**2 + (y-cy)**2 - h**2) < eps**2:
+                    try:
+                        if type(C) == int:
+                            target.canvas[v].color = target.toolbar.palette.colors[C]
+                            target.canvas[v].update()
+                            target.screen.blit(target.canvas[v].image, target.canvas[v])
+                        else:
+                            target.canvas[v].color = C
+                            target.canvas[v].update()
+                            target.screen.blit(target.canvas[v].image, target.canvas[v])
+                    except IndexError:
+                        pass
+    except KeyError:
+        pass
+    target.working_data = False
+
+def oval_f(target, mp, C):
+    try:
+        eps = int(target.clipboard['height']/2)
+        cx = int(mp[0]/target.cell_size) + int(target.clipboard['width']/2)-1
+        cy = int(mp[1]/target.cell_size) + int(target.clipboard['height']/2)-1
+        v1 = (int(mp[1]/target.cell_size) * int(list(target.canvas_size)[0]/target.cell_size)) + int(mp[0]/target.cell_size)
+        for x in range(target.clipboard['width']):
+            for y in range(target.clipboard['height']):
+                v = v1 + ((y * int(list(target.canvas_size)[0]/target.cell_size)) + x)
+                w = int(target.clipboard['width']/2)-1
+                h = int(target.clipboard['height']/2)-1
+                if abs((x-cx)**2 + (y-cy)**2 - h**2) < eps**2:
+                    try:
+                        if type(C) == int:
+                            target.canvas[v].color = target.toolbar.palette.colors[C]
+                            target.canvas[v].update()
+                            target.screen.blit(target.canvas[v].image, target.canvas[v])
+                        else:
+                            target.canvas[v].color = C
+                            target.canvas[v].update()
+                            target.screen.blit(target.canvas[v].image, target.canvas[v])
+                    except IndexError:
+                        pass
+    except KeyError:
+        pass
+    target.working_data = False
 
 def paste(target, mp, mode=0):
     try:
@@ -53,12 +151,13 @@ def paste(target, mp, mode=0):
                     pass
     except KeyError:
         pass
+    target.working_data = False
 
 def blur(target, mode=0):
     w = int(list(target.canvas_size)[0]/target.cell_size)
     h = int(list(target.canvas_size)[1]/target.cell_size)
-    for y in range(h):
-        for x in range(w):
+    for y in range(0, w):
+        for x in range(0, h):
             v = int((y*w)+x)
             lr = []
             lg = []
@@ -90,6 +189,7 @@ def blur(target, mode=0):
             target.canvas[v].color = blend
             target.canvas[v].update()
             target.screen.blit(target.canvas[v].image, target.canvas[v])
+    target.working_data = False
 
 def draw(target, mp, C):
     if type(C) == int:
