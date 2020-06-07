@@ -341,6 +341,11 @@ class Engine:
                                 self.working_data = True
                                 tools.oval_e(self, mp, self.left_color)
                                 pg.display.update(self.canvas_area)
+                        if self.cursor == cursor_crcl:
+                            if not self.working_data:
+                                self.working_data = True
+                                tools.circle(self, mp, self.left_color)
+                                pg.display.update(self.canvas_area)
                         if self.cursor == cursor_fill:
                             if not self.working_data:
                                 self.working_data = True
@@ -375,6 +380,11 @@ class Engine:
                                 self.working_data = True
                                 tools.oval_e(self, mp, self.right_color)
                                 pg.display.update(self.canvas_area)
+                        if self.cursor == cursor_crcl:
+                            if not self.working_data:
+                                self.working_data = True
+                                tools.circle(self, mp, self.right_color)
+                                pg.display.update(self.canvas_area)
                         if self.cursor == cursor_fill:
                             if not self.working_data:
                                 self.working_data = True
@@ -392,6 +402,10 @@ class Engine:
                         if not self.working_data:
                             self.working_data = True
                             tools.set_select(self, mp)
+                        for c in self.clipboard['matrix']:
+                            c.update()
+                            self.screen.blit(c.image, c)
+                            pg.display.update(self.canvas_area)
         ### KEYS ###
             if event.type == pg.KEYDOWN:
                 # Rotation
