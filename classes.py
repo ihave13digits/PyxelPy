@@ -113,7 +113,7 @@ class Toolbar:
         self.tool_11 = Button(x+CELL_SIZE*4, y+CELL_SIZE*12, 'oval.png', cursor_oval)
         self.tool_12 = Button(x+CELL_SIZE*6, y+CELL_SIZE*12, 'ovle.png', cursor_ovle)
 
-        self.tool_13 = Button(x+CELL_SIZE*0, y+CELL_SIZE*14, 'tool.png', cursor_)
+        self.tool_13 = Button(x+CELL_SIZE*0, y+CELL_SIZE*14, 'tool.png', cursor_crcl)
         self.tool_14 = Button(x+CELL_SIZE*2, y+CELL_SIZE*14, 'tool.png', cursor_)
         self.tool_15 = Button(x+CELL_SIZE*4, y+CELL_SIZE*14, 'tool.png', cursor_)
         self.tool_16 = Button(x+CELL_SIZE*6, y+CELL_SIZE*14, 'tool.png', cursor_)
