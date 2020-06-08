@@ -5,18 +5,30 @@ def select(target, mp):
 
 def set_select(target, mp):
     target.click_buffer.append(mp)
-
+    l = len(target.click_buffer)-1
     data = {'width' : 0, 'height' : 0, 'colors' : [], 'matrix' : []}
-    v = len(target.click_buffer)-1
-    x1 = int(target.click_buffer[0][0]/target.cell_size)
-    y1 = int(target.click_buffer[0][1]/target.cell_size)
-    x2 = int(target.click_buffer[v][0]/target.cell_size)
-    y2 = int(target.click_buffer[v][1]/target.cell_size)
+
+    if (
+            int(target.click_buffer[0][0]/target.cell_size) < int(target.click_buffer[l][0]/target.cell_size)
+                    ) and (
+                        int(target.click_buffer[0][1]/target.cell_size) < int(target.click_buffer[l][1]/target.cell_size)):
+        x1 = int(target.click_buffer[0][0]/target.cell_size)
+        y1 = int(target.click_buffer[0][1]/target.cell_size)
+        x2 = int(target.click_buffer[l][0]/target.cell_size)
+        y2 = int(target.click_buffer[l][1]/target.cell_size)
+        step = 1
+    else:
+        y1 = int(target.click_buffer[0][0]/target.cell_size)
+        x1 = int(target.click_buffer[0][1]/target.cell_size)
+        y2 = int(target.click_buffer[l][0]/target.cell_size)
+        x2 = int(target.click_buffer[l][1]/target.cell_size)
+        step = -1
+    
     data['width'] = abs(x1 - x2)+1
     data['height'] = abs(y1 - y2)+1
 
-    for x in range(x1, x2+1):
-        for y in range(y1, y2+1):
+    for x in range(x1, x2+1, step):
+        for y in range(y1, y2+1, step):
             v = int(y * int(list(target.canvas_size)[0])/target.cell_size) + x
             data['colors'].append(target.canvas[v].color)
             data['matrix'].append(target.canvas[v])
@@ -76,14 +88,14 @@ def circle(target, mp, C, mode=1):
             r = int(target.clipboard['width']/2)
         
         if mode == 0:
-            eps = r/6.28
+            eps = r/3.14
         else:
-            eps = r/2
-        cx = mx + int(target.clipboard['width']/2)
-        cy = my + int(target.clipboard['height']/2)
+            eps = r
+        cx = mx + int(r/2)
+        cy = my + int(r/2)
         v1 = (int(mp[1]/target.cell_size) * int(list(target.canvas_size)[0]/target.cell_size)) + int(mp[0]/target.cell_size)
-        for x in range(int(mp[0]/target.cell_size), target.clipboard['width']+int(mp[0]/target.cell_size)):
-            for y in range(int(mp[1]/target.cell_size), target.clipboard['height']+int(mp[1]/target.cell_size)):
+        for x in range(mx, r+mx):
+            for y in range(my, r+my):
                 v = v1 + ((y * int(list(target.canvas_size)[0]/target.cell_size)) + x)
                 if abs( (x-cx)**2 + (y-cy)**2 - r**2) < eps**2:
                     try:
@@ -103,7 +115,6 @@ def circle(target, mp, C, mode=1):
 
 def oval_e(target, mp, C):
     try:
-        eps = ((target.clipboard['width'] + target.clipboard['height'])/2)/3.14#6.28
         w = int(target.clipboard['width']/2)
         h = int(target.clipboard['height']/2)
         cx = int(mp[0]/target.cell_size) + (int(target.clipboard['width']/2))
@@ -112,26 +123,27 @@ def oval_e(target, mp, C):
         for x in range(int(mp[0]/target.cell_size), target.clipboard['width']+int(mp[0]/target.cell_size)):
             for y in range(int(mp[1]/target.cell_size), target.clipboard['height']+int(mp[1]/target.cell_size)):
                 v = v1 + ((y * int(list(target.canvas_size)[0]/target.cell_size)) + x)
-                if abs( (((x-cx)**2) / w**2) + (((y-cy)**2) / h**2) ) == 1:
-                #if abs(((x+cx)**2/w**2) + ((y+cy)**2/h**2)) < eps**2:
-                    try:
-                        if type(C) == int:
-                            target.canvas[v].color = target.toolbar.palette.colors[C]
-                            target.canvas[v].update()
-                            target.screen.blit(target.canvas[v].image, target.canvas[v])
-                        else:
-                            target.canvas[v].color = C
-                            target.canvas[v].update()
-                            target.screen.blit(target.canvas[v].image, target.canvas[v])
-                    except IndexError:
-                        pass
+                try:
+                    if abs( (((x-cx)**2) / w**2) + (((y-cy)**2) / h**2) ) <= 1:
+                        try:
+                            if type(C) == int:
+                                target.canvas[v].color = target.toolbar.palette.colors[C]
+                                target.canvas[v].update()
+                                target.screen.blit(target.canvas[v].image, target.canvas[v])
+                            else:
+                                target.canvas[v].color = C
+                                target.canvas[v].update()
+                                target.screen.blit(target.canvas[v].image, target.canvas[v])
+                        except IndexError:
+                            pass
+                except ZeroDivisionError:
+                    pass
     except KeyError:
         pass
     target.working_data = False
 
 def oval_f(target, mp, C):
     try:
-        eps = ((target.clipboard['width'] + target.clipboard['height'])/2)/3.14#6.28
         w = int(target.clipboard['width']/2)
         h = int(target.clipboard['height']/2)
         cx = int(mp[0]/target.cell_size) + (int(target.clipboard['width']/2))
@@ -140,19 +152,21 @@ def oval_f(target, mp, C):
         for x in range(int(mp[0]/target.cell_size), target.clipboard['width']+int(mp[0]/target.cell_size)):
             for y in range(int(mp[1]/target.cell_size), target.clipboard['height']+int(mp[1]/target.cell_size)):
                 v = v1 + ((y * int(list(target.canvas_size)[0]/target.cell_size)) + x)
-                if abs( (((x-cx)**2) / w**2) + (((y-cy)**2) / h**2) ) <= 1:
-                #if abs(((x+cx)**2/w**2) + ((y+cy)**2/h**2)) < eps**2:
-                    try:
-                        if type(C) == int:
-                            target.canvas[v].color = target.toolbar.palette.colors[C]
-                            target.canvas[v].update()
-                            target.screen.blit(target.canvas[v].image, target.canvas[v])
-                        else:
-                            target.canvas[v].color = C
-                            target.canvas[v].update()
-                            target.screen.blit(target.canvas[v].image, target.canvas[v])
-                    except IndexError:
-                        pass
+                try:
+                    if abs( (((x-cx)**2) / w**2) + (((y-cy)**2) / h**2) ) <= 1:
+                        try:
+                            if type(C) == int:
+                                target.canvas[v].color = target.toolbar.palette.colors[C]
+                                target.canvas[v].update()
+                                target.screen.blit(target.canvas[v].image, target.canvas[v])
+                            else:
+                                target.canvas[v].color = C
+                                target.canvas[v].update()
+                                target.screen.blit(target.canvas[v].image, target.canvas[v])
+                        except IndexError:
+                            pass
+                except ZeroDivisionError:
+                    pass
     except KeyError:
         pass
     target.working_data = False
@@ -291,7 +305,7 @@ def flood_fill(target, mp, C):
                         been_set.append(vs)
                         to_set.append(vs)
         if ve < height*width and ve >= 0:
-            if int(target.canvas[ve].posx/target.cell_size) < width*height:
+            if int(target.canvas[ve].posx/target.cell_size) < width-1:
                 if target.canvas[ve].color == remove:
                     if ve not in been_set:
                         been_set.append(ve)
