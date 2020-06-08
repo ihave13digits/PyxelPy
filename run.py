@@ -142,7 +142,7 @@ class Engine:
             except FileExistsError:
                 pass
         self.res_dir = path.join(self.data_dir, 'res')
-    
+
     def start(self):
         self.install()
         # Handle Settings
@@ -169,9 +169,34 @@ class Engine:
         self.toolbar = Toolbar(ds[0], 0)
 
         PALETTE = PALETTE_256
-        for p in PALETTE:
-            for c in range(PALETTE[p][3], PALETTE[p][4], PALETTE[p][5]):
-                self.toolbar.palette.add_color(int(c*PALETTE[p][0]), int(c*PALETTE[p][1]), int(c*PALETTE[p][2]), 0)
+        for i, p in enumerate(PALETTE):
+            if i == 0:
+                self.toolbar.palette.add_color(0, 0, 0, 0)
+                for c in range(PALETTE[p][3], PALETTE[p][4], PALETTE[p][5]):
+                    self.toolbar.palette.add_color(int(c*PALETTE[p][0]), int(c*PALETTE[p][1]), int(c*PALETTE[p][2]), 0)
+            else:
+                for c in range(PALETTE[p][3], PALETTE[p][4], PALETTE[p][5]):
+                    R, G, B = c*PALETTE[p][0], c*PALETTE[p][1], c*PALETTE[p][2]
+                    color = (c*PALETTE[p][0], c*PALETTE[p][1], c*PALETTE[p][2])
+                    if color[0] > 255:
+                        val = round((color[0]-255+.1)/2)
+                        R, G, B = max(min(255, color[0]), 0), max(min(255, G+val), 0), max(min(255, B+val), 0)
+                    elif color[0] < 0:
+                        val = int((color[0] + color[0]*2)/2)
+                        R, G, B = max(min(255, color[0]), 0), max(min(255, G+val), 0), max(min(255, B+val), 0)
+                    if color[1] > 255:
+                        val = round((color[1]-255+.1)/2)
+                        R, G, B = max(min(255, R+val), 0), max(min(255, color[1]), 0), max(min(255, B+val), 0)
+                    elif color[1] < 0:
+                        val = int((color[1] + color[1]*2)/2)
+                        R, G, B = max(min(255, R+val), 0), max(min(255, color[1]), 0), max(min(255, B+val), 0)
+                    if color[2] > 255:
+                        val = round(((color[2])-255+.1)/2)
+                        R, G, B = max(min(255, R+val), 0), max(min(255, G+val), 0), max(min(255, color[2]), 0)
+                    elif color[2] < 0:
+                        val = int(((color[2]) + color[2]*2)/2)
+                        R, G, B = max(min(255, R+val), 0), max(min(255, G+val), 0), max(min(255, c[2]), 0)
+                    self.toolbar.palette.add_color(R, G, B, 0)
 
         self.toolbar.color_l.color = self.toolbar.palette.colors[self.left_color]
         self.toolbar.color_r.color = self.toolbar.palette.colors[self.right_color]
@@ -215,15 +240,15 @@ class Engine:
         self.event()
         self.toolbar.update()
         end = len(self.click_buffer)-1
+
         if len(self.click_buffer) > 1:
             xstart = int(self.click_buffer[0][0]/self.cell_size)
             ystart = int(self.click_buffer[0][1]/self.cell_size)
-            xstop = int(self.click_buffer[end][0]/self.cell_size)
-            ystop = int(self.click_buffer[end][1]/self.cell_size)
+            xstop = int(self.click_buffer[end][0]/self.cell_size)+1
+            ystop = int(self.click_buffer[end][1]/self.cell_size)+1
 
             sel = Cell(xstart*self.cell_size, ystart*self.cell_size, r=255, g=255, b=255, a=128)
             sel.set(xstop*self.cell_size, ystop*self.cell_size)
-            sel.image.convert_alpha()
             self.screen.blit(sel.image, sel)
             pg.display.update(self.canvas_area)
         else:
@@ -263,149 +288,149 @@ class Engine:
                 # Data
                 if self.toolbar.area.rect.collidepoint(mp[0], mp[1]):
                     if pg.mouse.get_pressed() == (1, 0, 0):
-                        if self.toolbar.button_save.rect.collidepoint(mp[0], mp[1]):
-                            if not self.working_data:
+                        if not self.working_data:
+                            if self.toolbar.button_save.rect.collidepoint(mp[0], mp[1]):
                                 print("Enter name to save")
                                 name = input(": ")
                                 self.working_data = True
-                            self.save(name)
-                        if self.toolbar.button_load.rect.collidepoint(mp[0], mp[1]):
-                            print("Enter name to load")
-                            name = input(": ")
-                            self.working_data = True
-                            self.load(name)
-                        if self.toolbar.button_export.rect.collidepoint(mp[0], mp[1]):
-                            if not self.working_data:
+                                self.save(name)
+                            if self.toolbar.button_load.rect.collidepoint(mp[0], mp[1]):
+                                print("Enter name to load")
+                                name = input(": ")
+                                self.working_data = True
+                                self.load(name)
+                            if self.toolbar.button_export.rect.collidepoint(mp[0], mp[1]):
                                 print("Enter name to save")
                                 name = input(": ")
                                 self.last_save_dir = name
                                 self.working_data = True
                                 self.port(name, 0)
-                        if self.toolbar.button_import.rect.collidepoint(mp[0], mp[1]):
-                            print("Enter name to load")
-                            name = input(": ")
-                            self.last_save_dir = name
-                            self.working_data = True
-                            self.port(name, 1)
-                    # Set Tool
-                        for t in self.toolbar.tools:
-                            if t.rect.collidepoint(mp[0], mp[1]):
-                                if t.cursor != None:
-                                    self.cursor = t.cursor
-                                    cursor = pg.cursors.compile(self.cursor, black='X', white='.', xor='o')
-                                    pg.mouse.set_cursor((16, 16), (0, 0), *cursor)
+                            if self.toolbar.button_import.rect.collidepoint(mp[0], mp[1]):
+                                print("Enter name to load")
+                                name = input(": ")
+                                self.last_save_dir = name
+                                self.working_data = True
+                                self.port(name, 1)
+                        # Set Tool
+                            for t in self.toolbar.tools:
+                                if t.rect.collidepoint(mp[0], mp[1]):
+                                    if t.cursor != None:
+                                        self.cursor = t.cursor
+                                        cursor = pg.cursors.compile(self.cursor, black='X', white='.', xor='o')
+                                        pg.mouse.set_cursor((16, 16), (0, 0), *cursor)
                     # Change Color
                     if self.toolbar.palette_area.rect.collidepoint(mp[0], mp[1]):
                         if pg.mouse.get_pressed() == (1, 0, 0):
-                            for i, c in enumerate(self.toolbar.cells):
-                                if c.rect.collidepoint(mp[0], mp[1]):
-                                    self.left_color = i
-                                    self.toolbar.color_l.color = self.toolbar.palette.colors[self.left_color]
-                                    self.toolbar.update()
-                                    self.screen.blit(self.toolbar.color_l.image, self.toolbar.color_l)
-                                    pg.display.update(self.toolbar.area)
+                            if not self.working_data:
+                                for i, c in enumerate(self.toolbar.cells):
+                                    if c.rect.collidepoint(mp[0], mp[1]):
+                                        self.left_color = i
+                                        self.toolbar.color_l.color = self.toolbar.palette.colors[self.left_color]
+                                        self.toolbar.update()
+                                        self.screen.blit(self.toolbar.color_l.image, self.toolbar.color_l)
+                                        pg.display.update(self.toolbar.area)
                         if pg.mouse.get_pressed() == (0, 0, 1):
-                            for i, c in enumerate(self.toolbar.cells):
-                                if c.rect.collidepoint(mp[0], mp[1]):
-                                    self.right_color = i
-                                    self.toolbar.color_r.color = self.toolbar.palette.colors[self.right_color]
-                                    self.toolbar.update()
-                                    self.screen.blit(self.toolbar.color_r.image, self.toolbar.color_r)
-                                    pg.display.update(self.toolbar.area)
+                            if not self.working_data:
+                                for i, c in enumerate(self.toolbar.cells):
+                                    if c.rect.collidepoint(mp[0], mp[1]):
+                                        self.right_color = i
+                                        self.toolbar.color_r.color = self.toolbar.palette.colors[self.right_color]
+                                        self.toolbar.update()
+                                        self.screen.blit(self.toolbar.color_r.image, self.toolbar.color_r)
+                                        pg.display.update(self.toolbar.area)
             ### CANVAS ###
                 # Apply Tool
                 if self.canvas_area.rect.collidepoint(mp[0], mp[1]):
                     if pg.mouse.get_pressed() == (1, 0, 0):
-                        if self.cursor == cursor_norm:
-                            tools.select(self, mp)
-                        if self.cursor == cursor_draw:
-                            tools.draw(self, mp, self.left_color)
-                            pg.display.update(self.canvas_area)
-                        if self.cursor == cursor_rect:
-                            if not self.working_data:
+                        if not self.working_data:
+                            if self.cursor == cursor_norm:
+                                tools.select(self, mp)
+                            if self.cursor == cursor_draw:
+                                tools.draw(self, mp, self.left_color)
+                                pg.display.update(self.canvas_area)
+                            if self.cursor == cursor_rect:
                                 self.working_data = True
                                 tools.rect_f(self, mp, self.left_color)
                                 pg.display.update(self.canvas_area)
-                        if self.cursor == cursor_rcte:
-                            if not self.working_data:
+                            if self.cursor == cursor_rcte:
                                 self.working_data = True
                                 tools.rect_e(self, mp, self.left_color)
                                 pg.display.update(self.canvas_area)
-                        if self.cursor == cursor_oval:
-                            if not self.working_data:
+                            if self.cursor == cursor_oval:
                                 self.working_data = True
                                 tools.oval_f(self, mp, self.left_color)
                                 pg.display.update(self.canvas_area)
-                        if self.cursor == cursor_ovle:
-                            if not self.working_data:
+                            if self.cursor == cursor_ovle:
                                 self.working_data = True
                                 tools.oval_e(self, mp, self.left_color)
                                 pg.display.update(self.canvas_area)
-                        if self.cursor == cursor_crcl:
-                            if not self.working_data:
+                            if self.cursor == cursor_crcl:
                                 self.working_data = True
                                 tools.circle(self, mp, self.left_color)
                                 pg.display.update(self.canvas_area)
-                        if self.cursor == cursor_fill:
-                            if not self.working_data:
+                            if self.cursor == cursor_fill:
                                 self.working_data = True
                                 tools.flood_fill(self, mp, self.left_color)
                                 pg.display.update(self.canvas_area)
-                        if self.cursor == cursor_pick:
-                            self.left_color = tools.dropper(self, mp)
-                            self.toolbar.color_l.color = tools.dropper(self, mp)
-                            self.screen.blit(self.toolbar.color_l.image, self.toolbar.color_l)
-                            pg.display.update(self.toolbar.area)
+                            if self.cursor == cursor_pick:
+                                self.left_color = tools.dropper(self, mp)
+                                self.toolbar.color_l.color = tools.dropper(self, mp)
+                                self.screen.blit(self.toolbar.color_l.image, self.toolbar.color_l)
+                                pg.display.update(self.toolbar.area)
                     if pg.mouse.get_pressed() == (0, 0, 1):
-                        if self.cursor == cursor_draw:
-                            tools.draw(self, mp, self.right_color)
-                            pg.display.update(self.canvas_area)
-                        if self.cursor == cursor_rect:
-                            if not self.working_data:
+                        if not self.working_data:
+                            if self.cursor == cursor_draw:
+                                tools.draw(self, mp, self.right_color)
+                                pg.display.update(self.canvas_area)
+                            if self.cursor == cursor_rect:
                                 self.working_data = True
                                 tools.rect_f(self, mp, self.right_color)
                                 pg.display.update(self.canvas_area)
-                        if self.cursor == cursor_rcte:
-                            if not self.working_data:
+                            if self.cursor == cursor_rcte:
                                 self.working_data = True
                                 tools.rect_e(self, mp, self.right_color)
                                 pg.display.update(self.canvas_area)
-                        if self.cursor == cursor_oval:
-                            if not self.working_data:
+                            if self.cursor == cursor_oval:
                                 self.working_data = True
                                 tools.oval_f(self, mp, self.right_color)
                                 pg.display.update(self.canvas_area)
-                        if self.cursor == cursor_ovle:
-                            if not self.working_data:
+                            if self.cursor == cursor_ovle:
                                 self.working_data = True
                                 tools.oval_e(self, mp, self.right_color)
                                 pg.display.update(self.canvas_area)
-                        if self.cursor == cursor_crcl:
-                            if not self.working_data:
+                            if self.cursor == cursor_crcl:
                                 self.working_data = True
                                 tools.circle(self, mp, self.right_color)
                                 pg.display.update(self.canvas_area)
-                        if self.cursor == cursor_fill:
-                            if not self.working_data:
+                            if self.cursor == cursor_fill:
                                 self.working_data = True
                                 tools.flood_fill(self, mp, self.right_color)
                                 pg.display.update(self.canvas_area)
-                        if self.cursor == cursor_pick:
-                            self.right_color = tools.dropper(self, mp)
-                            self.toolbar.color_r.color = tools.dropper(self, mp)
-                            self.screen.blit(self.toolbar.color_r.image, self.toolbar.color_r)
-                            pg.display.update(self.toolbar.area)
-            # Commit Selection
+                            if self.cursor == cursor_pick:
+                                self.right_color = tools.dropper(self, mp)
+                                self.toolbar.color_r.color = tools.dropper(self, mp)
+                                self.screen.blit(self.toolbar.color_r.image, self.toolbar.color_r)
+                                pg.display.update(self.toolbar.area)
+                    # Commit Selection
             if event.type == pg.MOUSEBUTTONUP:
                 if self.canvas_area.rect.collidepoint(mp[0], mp[1]):
                     if self.cursor == cursor_norm:
                         if not self.working_data:
                             self.working_data = True
                             tools.set_select(self, mp)
-                        for c in self.clipboard['matrix']:
-                            c.update()
-                            self.screen.blit(c.image, c)
-                            pg.display.update(self.canvas_area)
+                            for c in self.clipboard['matrix']:
+                                c.update()
+                                self.screen.blit(c.image, c)
+                                pg.display.update(self.canvas_area)
+                else:
+                    for s in self.toolbar.cells:
+                        self.screen.blit(s.image, s)
+                    for b in self.toolbar.buttons:
+                        self.screen.blit(b.image, b)
+                    for t in self.toolbar.tools:
+                        self.screen.blit(t.image, t)
+                    pg.display.update(self.toolbar.palette_area)
+                    pg.display.update(self.toolbar.area)
         ### KEYS ###
             if event.type == pg.KEYDOWN:
                 # Rotation
@@ -424,9 +449,10 @@ class Engine:
                         pg.display.update(self.canvas_area)
                 # Quick Save
                 if (event.mod == pg.KMOD_LCTRL or event.mod == pg.KMOD_RCTRL) and event.key == pg.K_s:
-                    if self.last_save_dir != '':
-                        self.working_data = True
-                        self.port(self.last_save_dir, 0)
+                    if not self.working_data:
+                        if self.last_save_dir != '':
+                            self.working_data = True
+                            self.port(self.last_save_dir, 0)
                 # Grid
                 if (event.mod == pg.KMOD_LCTRL or event.mod == pg.KMOD_RCTRL) and event.key == pg.K_g:
                     self.grid = False
