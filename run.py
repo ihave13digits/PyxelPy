@@ -69,6 +69,7 @@ class Engine:
         try:
             with open(path.join(self.data_dir, "{}.bmd".format(load_dir)), 'rb') as f:
                 data = pickle.load(f)
+                print(data)
                 f.close()
 
             self.canvas = data['canvas']
@@ -348,6 +349,9 @@ class Engine:
                             if self.cursor == cursor_draw:
                                 tools.draw(self, mp, self.left_color)
                                 pg.display.update(self.canvas_area)
+                            if self.cursor == cursor_line:
+                                tools.line(self, mp, self.left_color)
+                                pg.display.update(self.canvas_area)
                             if self.cursor == cursor_rect:
                                 self.working_data = True
                                 tools.rect_f(self, mp, self.left_color)
@@ -381,6 +385,9 @@ class Engine:
                         if not self.working_data:
                             if self.cursor == cursor_draw:
                                 tools.draw(self, mp, self.right_color)
+                                pg.display.update(self.canvas_area)
+                            if self.cursor == cursor_line:
+                                tools.line(self, mp, self.right_color)
                                 pg.display.update(self.canvas_area)
                             if self.cursor == cursor_rect:
                                 self.working_data = True

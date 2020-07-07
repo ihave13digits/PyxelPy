@@ -78,7 +78,7 @@ def rect_f(target, mp, C):
         pass
     target.working_data = False
 
-def circle(target, mp, C, mode=1):
+def circle(target, mp, C, mode=0):
     mx = int(mp[0]/target.cell_size)
     my = int(mp[1]/target.cell_size)
     try:
@@ -124,7 +124,7 @@ def oval_e(target, mp, C):
             for y in range(int(mp[1]/target.cell_size), target.clipboard['height']+int(mp[1]/target.cell_size)):
                 v = v1 + ((y * int(list(target.canvas_size)[0]/target.cell_size)) + x)
                 try:
-                    if abs( (((x-cx)**2) / w**2) + (((y-cy)**2) / h**2) ) <= 1:
+                    if abs( (((x-cx)**2) / w**2) + (((y-cy)**2) / h**2) ) == 1:
                         try:
                             if type(C) == int:
                                 target.canvas[v].color = target.toolbar.palette.colors[C]
@@ -207,8 +207,8 @@ def paste(target, mp, mode=0):
 def blur(target, mode=0):
     w = int(list(target.canvas_size)[0]/target.cell_size)
     h = int(list(target.canvas_size)[1]/target.cell_size)
-    for y in range(0, w):
-        for x in range(0, h):
+    for x in range(0, w):
+        for y in range(0, h):
             v = int((y*w)+x)
             lr = []
             lg = []
@@ -260,6 +260,26 @@ def dropper(target, mp):
     for c in target.canvas:
         if c.rect.collidepoint(mp[0], mp[1]):
             return c.color
+
+def line(target, mp, C):
+    w = target.clipboard['width']
+    h = target.clipboard['height']
+    mx = int(mp[0]/target.cell_size)
+    my = int(mp[1]/target.cell_size)
+    v1 = (int(mp[1]/target.cell_size) * int(list(target.canvas_size)[0]/target.cell_size)) + int(mp[0]/target.cell_size)
+    for x in range(mx, mx+w):
+        for y in range(my, my+h):
+            v = (y * int(list(target.canvas_size)[0]/target.cell_size)) + x
+            if v % w/h == 0:
+                try:
+                    if type(C) == int:
+                        target.canvas[v+v1].color = target.toolbar.palette.colors[C]
+                    else:
+                        target.canvas[v+v1].color = C
+                    target.canvas[v+v1].update()
+                    target.screen.blit(target.canvas[v+v1].image, target.canvas[v+v1])
+                except IndexError:
+                    pass
 
 def flood_fill(target, mp, C):
     ds = list(target.canvas_size)

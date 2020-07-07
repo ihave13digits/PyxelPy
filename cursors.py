@@ -79,12 +79,12 @@ cursor_oval = (# 16x16
   "    .XXXXXXXXXX.",
   "    .XXXXXXXXXX.",
   "    .XXXXXXXXXX.",
+  "    .XXXXXXXXXX.",
+  "    .XXXXXXXXXX.",
   "     .XXXXXXXX. ",
   "     .XXXXXXXX. ",
   "      ..XXXX..  ",
   "        ....    ",
-  "                ",
-  "                ",
   "                ",
   "                ")
 
@@ -97,12 +97,12 @@ cursor_ovle = (# 16x16
   "    .X.      .X.",
   "    .X.      .X.",
   "    .X.      .X.",
+  "    .X.      .X.",
+  "    .X.      .X.",
   "     .X.    .X. ",
   "     .XX....XX. ",
   "      ..XXXX..  ",
   "        ....    ",
-  "                ",
-  "                ",
   "                ",
   "                ")
 
