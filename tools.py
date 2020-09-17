@@ -262,24 +262,27 @@ def dropper(target, mp):
             return c.color
 
 def line(target, mp, C):
-    w = target.clipboard['width']
-    h = target.clipboard['height']
-    mx = int(mp[0]/target.cell_size)
-    my = int(mp[1]/target.cell_size)
-    v1 = (int(mp[1]/target.cell_size) * int(list(target.canvas_size)[0]/target.cell_size)) + int(mp[0]/target.cell_size)
-    for x in range(mx, mx+w):
-        for y in range(my, my+h):
-            v = (y * int(list(target.canvas_size)[0]/target.cell_size)) + x
-            if v % w/h == 0:
-                try:
-                    if type(C) == int:
-                        target.canvas[v+v1].color = target.toolbar.palette.colors[C]
-                    else:
-                        target.canvas[v+v1].color = C
-                    target.canvas[v+v1].update()
-                    target.screen.blit(target.canvas[v+v1].image, target.canvas[v+v1])
-                except IndexError:
-                    pass
+    try:
+        w = target.clipboard['width']
+        h = target.clipboard['height']
+        mx = int(mp[0]/target.cell_size)
+        my = int(mp[1]/target.cell_size)
+        v1 = (int(mp[1]/target.cell_size) * int(list(target.canvas_size)[0]/target.cell_size)) + int(mp[0]/target.cell_size)
+        for x in range(mx, mx+w):
+            for y in range(my, my+h):
+                v = (y * int(list(target.canvas_size)[0]/target.cell_size)) + x
+                if v % w/h == 0:
+                    try:
+                        if type(C) == int:
+                            target.canvas[v+v1].color = target.toolbar.palette.colors[C]
+                        else:
+                            target.canvas[v+v1].color = C
+                        target.canvas[v+v1].update()
+                        target.screen.blit(target.canvas[v+v1].image, target.canvas[v+v1])
+                    except IndexError:
+                        pass
+    except:
+        pass
 
 def flood_fill(target, mp, C):
     ds = list(target.canvas_size)
