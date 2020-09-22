@@ -113,7 +113,7 @@ def circle(target, mp, C, mode=0):
         pass
     target.working_data = False
 
-def oval_e(target, mp, C):
+def oval_e(target, mp, C, thicc):
     try:
         w = int(target.clipboard['width']/2)
         h = int(target.clipboard['height']/2)
@@ -124,7 +124,7 @@ def oval_e(target, mp, C):
             for y in range(int(mp[1]/target.cell_size), target.clipboard['height']+int(mp[1]/target.cell_size)):
                 v = v1 + ((y * int(list(target.canvas_size)[0]/target.cell_size)) + x)
                 try:
-                    if abs( (((x-cx)**2) / w**2) + (((y-cy)**2) / h**2) ) == 1:
+                    if abs( (((x-cx)**2) / w**2) + (((y-cy)**2) / h**2) ) <= 1+thicc and abs( (((x-cx)**2) / w**2) + (((y-cy)**2) / h**2) ) >= 1-thicc:
                         try:
                             if type(C) == int:
                                 target.canvas[v].color = target.toolbar.palette.colors[C]

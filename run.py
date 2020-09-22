@@ -34,6 +34,7 @@ class Engine:
         self.right_color = 0
 
         self.rotation = 0
+        self.tool_thickness = 0.125
 
         self.clipboard = {}
         self.root_dir = path.dirname(__file__)
@@ -366,7 +367,7 @@ class Engine:
                                 pg.display.update(self.canvas_area)
                             if self.cursor == cursor_ovle:
                                 self.working_data = True
-                                tools.oval_e(self, mp, self.left_color)
+                                tools.oval_e(self, mp, self.left_color, self.tool_thickness)
                                 pg.display.update(self.canvas_area)
                             if self.cursor == cursor_crcl:
                                 self.working_data = True
@@ -403,7 +404,7 @@ class Engine:
                                 pg.display.update(self.canvas_area)
                             if self.cursor == cursor_ovle:
                                 self.working_data = True
-                                tools.oval_e(self, mp, self.right_color)
+                                tools.oval_e(self, mp, self.right_color, self.tool_thickness)
                                 pg.display.update(self.canvas_area)
                             if self.cursor == cursor_crcl:
                                 self.working_data = True
