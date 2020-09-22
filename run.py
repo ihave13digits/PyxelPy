@@ -295,18 +295,18 @@ class Engine:
                                 name = input(": ")
                                 self.working_data = True
                                 self.save(name)
-                            if self.toolbar.button_load.rect.collidepoint(mp[0], mp[1]):
+                            elif self.toolbar.button_load.rect.collidepoint(mp[0], mp[1]):
                                 print("Enter name to load")
                                 name = input(": ")
                                 self.working_data = True
                                 self.load(name)
-                            if self.toolbar.button_export.rect.collidepoint(mp[0], mp[1]):
+                            elif self.toolbar.button_export.rect.collidepoint(mp[0], mp[1]):
                                 print("Enter name to save")
                                 name = input(": ")
                                 self.last_save_dir = name
                                 self.working_data = True
                                 self.port(name, 0)
-                            if self.toolbar.button_import.rect.collidepoint(mp[0], mp[1]):
+                            elif self.toolbar.button_import.rect.collidepoint(mp[0], mp[1]):
                                 print("Enter name to load")
                                 name = input(": ")
                                 self.last_save_dir = name
