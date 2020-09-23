@@ -283,6 +283,7 @@ def line(target, mp, C):
                         pass
     except:
         pass
+    target.working_data = False
 
 def flood_fill(target, mp, C):
     ds = list(target.canvas_size)

@@ -42,6 +42,8 @@ class Engine:
         self.img_dir = None
         self.res_dir = None
 
+        self.command_limit = 16
+        self.command_stack = []
         self.click_buffer = []
         self.cursor = cursor_norm
 
@@ -144,6 +146,9 @@ class Engine:
             except FileExistsError:
                 pass
         self.res_dir = path.join(self.data_dir, 'res')
+
+    def undo(self):
+        pass
 
     def start(self):
         self.install()
@@ -351,6 +356,7 @@ class Engine:
                                 tools.draw(self, mp, self.left_color)
                                 pg.display.update(self.canvas_area)
                             if self.cursor == cursor_line:
+                                self.working_data = True
                                 tools.line(self, mp, self.left_color)
                                 pg.display.update(self.canvas_area)
                             if self.cursor == cursor_rect:
@@ -388,6 +394,7 @@ class Engine:
                                 tools.draw(self, mp, self.right_color)
                                 pg.display.update(self.canvas_area)
                             if self.cursor == cursor_line:
+                                self.working_data = True
                                 tools.line(self, mp, self.right_color)
                                 pg.display.update(self.canvas_area)
                             if self.cursor == cursor_rect:
@@ -479,7 +486,7 @@ class Engine:
                     pg.display.update(self.canvas_area)
                 # Undo
                 if (event.mod == pg.KMOD_LCTRL or event.mod == pg.KMOD_RCTRL) and event.key == pg.K_z:
-                    print("I really needa learn how to do that..")
+                    self.undo()
                 # Exiting
                 if event.key == pg.K_ESCAPE:
                     self.running = False
